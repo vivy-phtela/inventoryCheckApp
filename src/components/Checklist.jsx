@@ -31,25 +31,38 @@ const Checklist = () => {
   // 在庫履歴をバックエンドから取得してグルーピング(非同期処理)
   const handleFetchStockHistory = async (itemId) => {
     try {
-      const data = await fetchStockHistory(itemId);
+      const { unit1_history, unit2_history } = await fetchStockHistory(itemId);
 
       // 日付ごとにunit1とunit2の在庫数をグルーピング
       const groupedHistory = {};
-      ["unit1_history", "unit2_history"].forEach((unitType) => {
-        data.forEach((entry) => {
-          const date = new Date(entry.date).toLocaleString("ja-JP", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            second: "numeric",
-          });
-          if (!groupedHistory[date]) {
-            groupedHistory[date] = {};
-          }
-          groupedHistory[date][unitType] = entry.stock;
+      unit1_history.forEach((entry) => {
+        const date = new Date(entry.date).toLocaleString("ja-JP", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
         });
+        if (!groupedHistory[date]) {
+          groupedHistory[date] = {};
+        }
+        groupedHistory[date].unit1_history = entry.stock;
+      });
+
+      unit2_history.forEach((entry) => {
+        const date = new Date(entry.date).toLocaleString("ja-JP", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+        });
+        if (!groupedHistory[date]) {
+          groupedHistory[date] = {};
+        }
+        groupedHistory[date].unit2_history = entry.stock;
       });
 
       // 在庫履歴を更新
@@ -75,15 +88,14 @@ const Checklist = () => {
 
       let latestCheckDate = null;
       // unit1の最新の在庫履歴の日付だけを取得
-      const data = await fetchStockHistory(items[0].id);
-      const latestUnit1Date = new Date(data[0].date).toLocaleDateString(
-        "ja-JP",
-        {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }
-      );
+      const { unit1_history } = await fetchStockHistory(items[0].id);
+      const latestUnit1Date = new Date(
+        unit1_history[0].date
+      ).toLocaleDateString("ja-JP", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      });
       latestCheckDate = latestUnit1Date;
 
       if (latestCheckDate === today) {
