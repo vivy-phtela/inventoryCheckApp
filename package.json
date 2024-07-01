@@ -1,7 +1,8 @@
 {
   "name": "react-stock-check-app",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "homepage": "./",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx webpack --config webpack.config.js",
