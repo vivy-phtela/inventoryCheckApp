@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Keypad from "./Keypad";
 import AddItem from "./AddItem";
+import {
+  fetchItems,
+  addItem,
+  fetchStockHistory,
+  addStock,
+} from "../../utils/spabaseFunctions"; // supabaseのAPI関数をインポート
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Checklist = () => {
@@ -16,51 +22,52 @@ const Checklist = () => {
   useEffect(() => {
     const fetchAndCheckItems = async () => {
       const fetchedItems = await fetchItems();
+      setItems(fetchedItems);
       checkDailyStatus(fetchedItems);
     };
     fetchAndCheckItems();
   }, []);
 
-  // 項目をバックエンドから取得(非同期処理)
-  const fetchItems = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/items");
-      const data = await response.json();
-      setItems(data);
-      return data;
-    } catch (error) {
-      console.error("Failed to fetch items:", error);
-    }
-  };
-
   // 在庫履歴をバックエンドから取得してグルーピング(非同期処理)
-  const fetchStockHistory = async (itemId) => {
+  const handleFetchStockHistory = async (itemId) => {
     try {
-      const response = await fetch(`http://localhost:5000/stocks/${itemId}`);
-      const data = await response.json();
+      const { unit1_history, unit2_history } = await fetchStockHistory(itemId);
 
       // 日付ごとにunit1とunit2の在庫数をグルーピング
       const groupedHistory = {};
-      ["unit1_history", "unit2_history"].forEach((unitType) => {
-        data[unitType].forEach((entry) => {
-          const date = new Date(entry.date).toLocaleString("ja-JP", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            second: "numeric",
-          });
-          if (!groupedHistory[date]) {
-            groupedHistory[date] = {};
-          }
-          groupedHistory[date][unitType] = entry.stock;
+      unit1_history.forEach((entry) => {
+        const date = new Date(entry.date).toLocaleString("ja-JP", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
         });
+        if (!groupedHistory[date]) {
+          groupedHistory[date] = {};
+        }
+        groupedHistory[date].unit1_history = entry.stock;
+      });
+
+      unit2_history.forEach((entry) => {
+        const date = new Date(entry.date).toLocaleString("ja-JP", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+        });
+        if (!groupedHistory[date]) {
+          groupedHistory[date] = {};
+        }
+        groupedHistory[date].unit2_history = entry.stock;
       });
 
       // 在庫履歴を更新
-      setStockHistory(function (prevHistory) {
-        var newHistory = { ...prevHistory };
+      setStockHistory((prevHistory) => {
+        const newHistory = { ...prevHistory };
         newHistory[itemId] = groupedHistory;
         return newHistory;
       });
@@ -81,12 +88,9 @@ const Checklist = () => {
 
       let latestCheckDate = null;
       // unit1の最新の在庫履歴の日付だけを取得
-      const response = await fetch(
-        `http://localhost:5000/stocks/${items[0].id}`
-      );
-      const data = await response.json();
+      const { unit1_history } = await fetchStockHistory(items[0].id);
       const latestUnit1Date = new Date(
-        data.unit1_history[0].date
+        unit1_history[0].date
       ).toLocaleDateString("ja-JP", {
         year: "numeric",
         month: "numeric",
@@ -105,16 +109,11 @@ const Checklist = () => {
   };
 
   // 新しい項目をバックエンドに送信(非同期処理)
-  const addItem = async (item, unit1, unit2) => {
+  const handleAddItem = async (item, unit1, unit2) => {
     try {
-      await fetch("http://localhost:5000/items", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ item, unit1, unit2 }),
-      });
-      fetchItems(); //最新の項目一覧を取得
+      await addItem(item, unit1, unit2);
+      const fetchedItems = await fetchItems();
+      setItems(fetchedItems); // 最新の項目一覧を取得
     } catch (error) {
       console.error("Failed to add item:", error);
     }
@@ -124,7 +123,7 @@ const Checklist = () => {
   const handleStockChange = (itemId, unit, stock) => {
     setNewStocks((prevStocks) => {
       const updatedStocks = { ...prevStocks };
-      if (updatedStocks[itemId] === undefined) {
+      if (!updatedStocks[itemId]) {
         updatedStocks[itemId] = {}; // 新規項目の場合は初期化
       }
       updatedStocks[itemId][unit] = stock; // 在庫数を更新
@@ -148,23 +147,13 @@ const Checklist = () => {
   };
 
   // 入力した在庫数をバックエンドに送信(非同期処理)
-  const addStocks = async () => {
+  const handleAddStocks = async () => {
     try {
       // newStocksオブジェクトの全てのitemIdを参照
       for (const itemId in newStocks) {
         // itemId内の全てのunitを参照
         for (const unit in newStocks[itemId]) {
-          await fetch("http://localhost:5000/stocks", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              item_id: itemId,
-              stock: newStocks[itemId][unit],
-              unit: unit,
-            }),
-          });
+          await addStock(itemId, newStocks[itemId][unit], unit);
         }
       }
       setNewStocks({}); // 在庫数を初期化
@@ -188,7 +177,7 @@ const Checklist = () => {
     });
     // アコーディオンが閉じているとき
     if (!accordionState[itemId]) {
-      fetchStockHistory(itemId);
+      handleFetchStockHistory(itemId);
     }
   };
 
@@ -249,7 +238,7 @@ const Checklist = () => {
         <h1 className="fw-bold">Daily棚卸</h1>
         <span className="fw-bold ms-3">{dailyCheckStatus}</span>
       </div>
-      <AddItem addItem={addItem} />
+      <AddItem addItem={handleAddItem} />
       <ul className="list-group">
         {items.map((item) => (
           <li
@@ -343,7 +332,7 @@ const Checklist = () => {
       <div className="d-flex justify-content-end" style={{ width: "70%" }}>
         <button
           className="btn btn-success mt-3 btn-lg"
-          onClick={addStocks}
+          onClick={handleAddStocks}
           disabled={!allStocksEntered()} // すべての欄が入力されている場合のみ有効に
         >
           確定
