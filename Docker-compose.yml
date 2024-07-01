@@ -2,24 +2,13 @@ version: "3"
 services:
   frontend:
     build:
-      context: ./frontend
+      context: ./
     ports:
-      - "3000:3000"
+      - "8080:8080"
     volumes:
-      - ./frontend:/app
+      - ./:/app
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=development
     stdin_open: true
     tty: true
-    depends_on:
-      - backend
-
-  backend:
-    build:
-      context: ./backend
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./backend:/app
-    environment:
-      - FLASK_ENV=development
