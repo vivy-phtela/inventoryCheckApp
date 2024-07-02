@@ -1,6 +1,6 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
-const env = require("dotenv").config().parsed;
+const dotenv = require("dotenv").config();
 
 module.exports = {
   mode: "development",
@@ -39,18 +39,14 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: __dirname + "/src/index.html",
     }),
-    env !== undefined
-      ? new webpack.DefinePlugin({
-          "process.env": JSON.stringify(env),
-        })
-      : new webpack.DefinePlugin({
-          "process.env.REACT_PUBLIC_SUPABASE_URL": JSON.stringify(
-            process.env.REACT_PUBLIC_SUPABASE_URL
-          ),
-          "process.env.REACT_PUBLIC_SUPABASE_ANON_KEY": JSON.stringify(
-            process.env.REACT_PUBLIC_SUPABASE_ANON_KEY
-          ),
-        }),
+    new webpack.DefinePlugin({
+      "process.env.REACT_PUBLIC_SUPABASE_URL": JSON.stringify(
+        process.env.REACT_PUBLIC_SUPABASE_URL
+      ),
+      "process.env.REACT_PUBLIC_SUPABASE_ANON_KEY": JSON.stringify(
+        process.env.REACT_PUBLIC_SUPABASE_ANON_KEY
+      ),
+    }),
   ],
   devServer: {
     static: {
