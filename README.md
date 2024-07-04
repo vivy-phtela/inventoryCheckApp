@@ -23,7 +23,7 @@
 
 ## バージョン 1.00（2024/06/18 完成）
 
-![screen1](https://github.com/vivy-phtela/stockCheckApp/assets/114901440/f99127be-e044-4f3e-b9a5-5e49fdd0dea2)
+<img src="https://github.com/vivy-phtela/stockCheckApp/assets/114901440/f99127be-e044-4f3e-b9a5-5e49fdd0dea2" width=500>
 
 最低限の機能を備えたアプリが完成しました．ラーメン屋だってバレてしまいますね(笑)
 入力はキッチン備え付けの iPad で行います．キッチンには原則スマホを持ち込めないため，レスポンシブ対応はスキップします．
@@ -75,5 +75,6 @@
 + 次は実際にお店で使用してもらってフィードバックを得ようと思います．
 
 ## この日，後輩に実際にテストしてもらいました！
-![IMG_0828](https://github.com/vivy-phtela/stockCheckApp/assets/114901440/35b7b7fe-eccb-44b6-999f-e1bd89f8a54b)
-「めっちゃやりやすい！」と少し感動してました笑．改善点もいくつか見つかったので修正を行い，毎日使ってもらえるアプリを目指します．
+<img src="https://github.com/vivy-phtela/stockCheckApp/assets/114901440/35b7b7fe-eccb-44b6-999f-e1bd89f8a54b" width=200>
+<br>
+「めっちゃやりやすい！」と少し感動してました(笑)以前の棚卸しよりも10分ほど早くなりました．改善点もいくつか見つかったので修正を行い，毎日使ってもらえるアプリを目指します．
