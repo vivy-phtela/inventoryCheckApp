@@ -352,7 +352,7 @@ const Checklist = () => {
         <button
           className="btn btn-success mt-3 btn-lg"
           onClick={handleAddStocks}
-          // disabled={!allStocksEntered()} // すべての欄が入力されている場合のみ有効に
+          disabled={!allStocksEntered()} // すべての欄が入力されている場合のみ有効に
         >
           確定
         </button>
