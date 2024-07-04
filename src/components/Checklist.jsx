@@ -8,6 +8,7 @@ import {
   addStock,
 } from "../../utils/spabaseFunctions"; // supabaseのAPI関数をインポート
 import "bootstrap/dist/css/bootstrap.min.css";
+import { saveAs } from "file-saver";
 
 const Checklist = () => {
   const [items, setItems] = useState([]); // 項目一覧
@@ -157,10 +158,28 @@ const Checklist = () => {
         }
       }
       setNewStocks({}); // 在庫数を初期化
+      exportToCSV(newStocks, items); // 在庫データをCSVファイルで出力
       window.location.reload(); // ページをリロード
     } catch (error) {
       console.error("Failed to add stocks:", error);
     }
+  };
+
+  const exportToCSV = (stocks, items) => {
+    let csvContent = "項目名,在庫数,単位\n"; // ヘッダーを追加
+
+    for (const itemId in stocks) {
+      const item = items.find((item) => item.id.toString() === itemId);
+      if (!item) continue;
+
+      for (const unit in stocks[itemId]) {
+        const unitName = unit === "unit1" ? item.unit1 : item.unit2;
+        csvContent += `${item.item},${stocks[itemId][unit]},${unitName}\n`;
+      }
+    }
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "stocks.csv");
   };
 
   // アコーディオンの開閉状態を切り替え
@@ -333,7 +352,7 @@ const Checklist = () => {
         <button
           className="btn btn-success mt-3 btn-lg"
           onClick={handleAddStocks}
-          disabled={!allStocksEntered()} // すべての欄が入力されている場合のみ有効に
+          // disabled={!allStocksEntered()} // すべての欄が入力されている場合のみ有効に
         >
           確定
         </button>
