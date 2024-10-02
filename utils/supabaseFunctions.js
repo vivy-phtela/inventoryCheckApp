@@ -1,4 +1,4 @@
-import { supabase } from "./spabase";
+import { supabase } from "./supabase";
 
 // 全ての項目を取得
 export const fetchItems = async () => {
