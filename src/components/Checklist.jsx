@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Keypad from "./Keypad";
 import AddItem from "./AddItem";
+import ConfirmationModal from "./ConfirmationModal";
+import ChecklistItem from "./ChecklistItem";
 import {
   fetchItems,
   addItem,
   fetchStockHistory,
   addStock,
-} from "../../utils/spabaseFunctions"; // supabaseのAPI関数をインポート
-import "bootstrap/dist/css/bootstrap.min.css";
-import { saveAs } from "file-saver";
+} from "../../utils/supabaseFunctions";
+import { exportToCSV } from "../../utils/exportToCSV";
+import Header from "./Header";
 
 const Checklist = () => {
   const [items, setItems] = useState([]); // 項目一覧
@@ -18,6 +20,8 @@ const Checklist = () => {
   const [currentItemId, setCurrentItemId] = useState(null); // フォーカスされてる項目のID
   const [currentUnit, setCurrentUnit] = useState(null); // フォーカスされてる単位(unit1かunit2)
   const [dailyCheckStatus, setDailyCheckStatus] = useState("本日未実施"); // 実施状況
+  const [showModal, setShowModal] = useState(false); // モーダルの表示状態
+  const [modalMessage, setModalMessage] = useState(""); // モーダルに表示するメッセージ
 
   // ページ読み込み時に1回だけ実行
   useEffect(() => {
@@ -80,6 +84,11 @@ const Checklist = () => {
   // 実施状況をチェック(非同期処理)
   const checkDailyStatus = async (items) => {
     try {
+      if (items.length === 0) {
+        setDailyCheckStatus("本日未実施");
+        return;
+      }
+
       // 今日の日付を取得
       const today = new Date().toLocaleDateString("ja-JP", {
         year: "numeric",
@@ -90,14 +99,16 @@ const Checklist = () => {
       let latestCheckDate = null;
       // unit1の最新の在庫履歴の日付だけを取得
       const { unit1_history } = await fetchStockHistory(items[0].id);
-      const latestUnit1Date = new Date(
-        unit1_history[0].date
-      ).toLocaleDateString("ja-JP", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-      });
-      latestCheckDate = latestUnit1Date;
+      if (unit1_history.length > 0) {
+        const latestUnit1Date = new Date(
+          unit1_history[0].date
+        ).toLocaleDateString("ja-JP", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        });
+        latestCheckDate = latestUnit1Date;
+      }
 
       if (latestCheckDate === today) {
         setDailyCheckStatus("本日実施済み");
@@ -134,7 +145,7 @@ const Checklist = () => {
 
   // キーパッドのボタンを押したときの処理
   const handleKeypadPress = (key) => {
-    const currentStock = // 現在の在庫数を取得
+    const currentStock =
       newStocks[currentItemId] && newStocks[currentItemId][currentUnit]
         ? newStocks[currentItemId][currentUnit]
         : "";
@@ -147,39 +158,35 @@ const Checklist = () => {
     handleStockChange(currentItemId, currentUnit, "");
   };
 
-  // 入力した在庫数をバックエンドに送信(非同期処理)
-  const handleAddStocks = async () => {
+  // モーダルを表示
+  const handleConfirmClick = () => {
+    setModalMessage("本当に確定してよいですか？");
+    setShowModal(true);
+  };
+
+  // モーダルで「はい」がクリックされたとき
+  const handleModalYes = async () => {
     try {
-      // newStocksオブジェクトの全てのitemIdを参照
+      // データを送信
       for (const itemId in newStocks) {
-        // itemId内の全てのunitを参照
         for (const unit in newStocks[itemId]) {
           await addStock(itemId, newStocks[itemId][unit], unit);
         }
       }
-      setNewStocks({}); // 在庫数を初期化
-      exportToCSV(newStocks, items); // 在庫データをCSVファイルで出力
-      window.location.reload(); // ページをリロード
+      // 在庫数を初期化
+      setNewStocks({});
+      // CSVを出力
+      exportToCSV(newStocks, items);
+      setShowModal(false);
+      window.location.reload();
     } catch (error) {
       console.error("Failed to add stocks:", error);
     }
   };
 
-  const exportToCSV = (stocks, items) => {
-    let csvContent = "項目名,在庫数,単位\n"; // ヘッダーを追加
-
-    for (const itemId in stocks) {
-      const item = items.find((item) => item.id.toString() === itemId);
-      if (!item) continue;
-
-      for (const unit in stocks[itemId]) {
-        const unitName = unit === "unit1" ? item.unit1 : item.unit2;
-        csvContent += `${item.item},${stocks[itemId][unit]},${unitName}\n`;
-      }
-    }
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    saveAs(blob, "stocks.csv");
+  // モーダルで「いいえ」がクリックされたとき
+  const handleModalNo = () => {
+    setShowModal(false);
   };
 
   // アコーディオンの開閉状態を切り替え
@@ -252,106 +259,30 @@ const Checklist = () => {
   };
 
   return (
-    <div className="containe-fluid p-5">
-      <div className="d-flex align-items-center">
-        <h1 className="fw-bold">Daily棚卸</h1>
-        <span className="fw-bold ms-3">{dailyCheckStatus}</span>
-      </div>
+    <div className="container-fluid p-5">
+      <Header dailyCheckStatus={dailyCheckStatus} />
       <AddItem addItem={handleAddItem} />
       <ul className="list-group">
         {items.map((item) => (
-          <li
+          <ChecklistItem
             key={item.id}
-            className={`list-group-item ${
-              // 入力されている場合は背景色を変更
-              isStockComplete(item) ? "bg-info text-white" : ""
-            }`}
-            style={{ width: "70%", margin: "0 auto 0 0" }}
-          >
-            <div className="d-flex justify-content-between align-items-center">
-              <div className="flex-grow-1">{item.item}</div>
-              <div className="d-flex flex-column align-items-center me-3">
-                <input
-                  type="number"
-                  className={`form-control ${
-                    // フォーカスされている場合は枠線の色を強調
-                    currentItemId === item.id && currentUnit === "unit1"
-                      ? "border-primary"
-                      : "border-secondary"
-                  }`}
-                  style={{ width: "100px", textAlign: "center" }}
-                  value={newStocks[item.id]?.unit1 || ""}
-                  onFocus={() => handleFocus(item.id, "unit1")}
-                  readOnly // キーパッドでしか入力できないようにする
-                />
-                <span className="mt-1">{item.unit1}</span>
-              </div>
-              {item.unit2 && (
-                <div className="d-flex flex-column align-items-center me-3">
-                  <input
-                    type="number"
-                    className={`form-control ${
-                      currentItemId === item.id && currentUnit === "unit2"
-                        ? "border-primary"
-                        : "border-secondary"
-                    }`}
-                    style={{ width: "100px", textAlign: "center" }}
-                    value={newStocks[item.id]?.unit2 || ""}
-                    onFocus={() => handleFocus(item.id, "unit2")}
-                    readOnly
-                  />
-                  <span className="mt-1">{item.unit2}</span>
-                </div>
-              )}
-              <button
-                className="btn btn-secondary" // アコーディオンの開閉ボタン
-                onClick={() => toggleAccordion(item.id)}
-              >
-                {accordionState[item.id]
-                  ? "在庫履歴を非表示"
-                  : "在庫履歴を表示"}
-              </button>
-            </div>
-            {accordionState[item.id] &&
-              stockHistory[item.id] && ( // アコーディオンが開いていて，かつ在庫履歴が存在する場合に表示
-                <ul className="list-group mt-2">
-                  <li className="list-group-item">
-                    <div className="d-flex flex-wrap">
-                      {Object.keys(stockHistory[item.id]).map(
-                        (
-                          date,
-                          index // 各日付ごとに在庫数を表示
-                        ) => (
-                          <div key={index} className="me-3">
-                            <span>{date}</span>
-                            <div>
-                              <span style={{ color: "red" }}>
-                                {stockHistory[item.id][date].unit1_history}
-                              </span>
-                              ({item.unit1})
-                            </div>
-                            {item.unit2 !== null && ( // unit2が存在する場合はunit2を表示
-                              <div>
-                                <span style={{ color: "blue" }}>
-                                  {stockHistory[item.id][date].unit2_history}
-                                </span>
-                                ({item.unit2})
-                              </div>
-                            )}
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </li>
-                </ul>
-              )}
-          </li>
+            item={{
+              ...item,
+              currentUnit: currentItemId === item.id ? currentUnit : null,
+            }}
+            newStock={newStocks[item.id] || {}}
+            onFocus={handleFocus}
+            onAccordionToggle={toggleAccordion}
+            isComplete={isStockComplete(item)}
+            isAccordionOpen={accordionState[item.id]}
+            stockHistory={stockHistory[item.id]}
+          />
         ))}
       </ul>
       <div className="d-flex justify-content-end" style={{ width: "70%" }}>
         <button
           className="btn btn-success mt-3 btn-lg"
-          onClick={handleAddStocks}
+          onClick={handleConfirmClick}
           disabled={!allStocksEntered()} // すべての欄が入力されている場合のみ有効に
         >
           確定
@@ -360,6 +291,13 @@ const Checklist = () => {
       <Keypad
         handleKeypadPress={handleKeypadPress}
         handleDelete={handleDelete}
+      />
+
+      <ConfirmationModal
+        show={showModal}
+        message={modalMessage}
+        onConfirm={handleModalYes}
+        onCancel={handleModalNo}
       />
     </div>
   );

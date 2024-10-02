@@ -1,6 +1,3 @@
-import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-
 // キーパッドコンポーネント
 const Keypad = ({ handleKeypadPress, handleDelete }) => {
   const keys = [
