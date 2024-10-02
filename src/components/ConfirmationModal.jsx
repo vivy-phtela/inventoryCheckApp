@@ -1,3 +1,4 @@
+// 確認モーダルコンポーネント
 const ConfirmationModal = ({ show, message, onConfirm, onCancel }) => {
   if (!show) return null; // モーダルが表示されていない場合は何もレンダリングしない
 

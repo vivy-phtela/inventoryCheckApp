@@ -1,3 +1,4 @@
+// 在庫履歴を表示するコンポーネント
 const StockHistory = ({ item, stockHistory }) => {
   return (
     <ul className="list-group mt-2">

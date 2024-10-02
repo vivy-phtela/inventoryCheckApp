@@ -9,7 +9,6 @@ import {
   fetchStockHistory,
   addStock,
 } from "../../utils/supabaseFunctions";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { saveAs } from "file-saver";
 import Header from "./Header";
 

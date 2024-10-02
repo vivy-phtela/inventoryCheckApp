@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-
 // 項目追加コンポーネント
+import React, { useState } from "react";
+
 const AddItem = ({ addItem }) => {
   const [newItem, setNewItem] = useState(""); // 新しい項目
   const [unit1, setUnit1] = useState(""); // メイン単位

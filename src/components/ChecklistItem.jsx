@@ -1,3 +1,4 @@
+// 項目ごとの在庫を入力するコンポーネント
 const ChecklistItem = ({
   item,
   newStock,
