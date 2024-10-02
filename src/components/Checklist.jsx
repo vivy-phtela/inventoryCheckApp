@@ -9,6 +9,7 @@ import {
 } from "../../utils/spabaseFunctions"; // supabaseのAPI関数をインポート
 import "bootstrap/dist/css/bootstrap.min.css";
 import { saveAs } from "file-saver";
+import ConfirmationModal from "./ConfirmationModal";
 
 const Checklist = () => {
   const [items, setItems] = useState([]); // 項目一覧
@@ -18,6 +19,8 @@ const Checklist = () => {
   const [currentItemId, setCurrentItemId] = useState(null); // フォーカスされてる項目のID
   const [currentUnit, setCurrentUnit] = useState(null); // フォーカスされてる単位(unit1かunit2)
   const [dailyCheckStatus, setDailyCheckStatus] = useState("本日未実施"); // 実施状況
+  const [showModal, setShowModal] = useState(false); // モーダルの表示状態
+  const [modalMessage, setModalMessage] = useState(""); // モーダルに表示するメッセージ
 
   // ページ読み込み時に1回だけ実行
   useEffect(() => {
@@ -147,22 +150,35 @@ const Checklist = () => {
     handleStockChange(currentItemId, currentUnit, "");
   };
 
-  // 入力した在庫数をバックエンドに送信(非同期処理)
-  const handleAddStocks = async () => {
+  // モーダルを表示
+  const handleConfirmClick = () => {
+    setModalMessage("本当に確定してよいですか？");
+    setShowModal(true);
+  };
+
+  // モーダルで「はい」がクリックされたとき
+  const handleModalYes = async () => {
     try {
-      // newStocksオブジェクトの全てのitemIdを参照
+      // データを送信
       for (const itemId in newStocks) {
-        // itemId内の全てのunitを参照
         for (const unit in newStocks[itemId]) {
           await addStock(itemId, newStocks[itemId][unit], unit);
         }
       }
-      setNewStocks({}); // 在庫数を初期化
-      exportToCSV(newStocks, items); // 在庫データをCSVファイルで出力
-      window.location.reload(); // ページをリロード
+      // 在庫数を初期化
+      setNewStocks({});
+      // CSVを出力
+      exportToCSV(newStocks, items);
+      setShowModal(false);
+      window.location.reload();
     } catch (error) {
       console.error("Failed to add stocks:", error);
     }
+  };
+
+  // 新規: モーダルで「いいえ」がクリックされたとき
+  const handleModalNo = () => {
+    setShowModal(false);
   };
 
   const exportToCSV = (stocks, items) => {
@@ -174,7 +190,7 @@ const Checklist = () => {
 
       for (const unit in stocks[itemId]) {
         const unitName = unit === "unit1" ? item.unit1 : item.unit2;
-        csvContent += `${item.item},${stocks[itemId][unit]},${unitName}\n`;
+        csvContent += `${item.item},${stocks[item.id][unit]},${unitName}\n`;
       }
     }
 
@@ -351,7 +367,7 @@ const Checklist = () => {
       <div className="d-flex justify-content-end" style={{ width: "70%" }}>
         <button
           className="btn btn-success mt-3 btn-lg"
-          onClick={handleAddStocks}
+          onClick={handleConfirmClick}
           disabled={!allStocksEntered()} // すべての欄が入力されている場合のみ有効に
         >
           確定
@@ -360,6 +376,13 @@ const Checklist = () => {
       <Keypad
         handleKeypadPress={handleKeypadPress}
         handleDelete={handleDelete}
+      />
+
+      <ConfirmationModal
+        show={showModal}
+        message={modalMessage}
+        onConfirm={handleModalYes}
+        onCancel={handleModalNo}
       />
     </div>
   );
