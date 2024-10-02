@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import Keypad from "./Keypad";
 import AddItem from "./AddItem";
+import ConfirmationModal from "./ConfirmationModal";
+import ChecklistItem from "./ChecklistItem";
 import {
   fetchItems,
   addItem,
   fetchStockHistory,
   addStock,
-} from "../../utils/spabaseFunctions"; // supabaseのAPI関数をインポート
+} from "../../utils/supabaseFunctions";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { saveAs } from "file-saver";
-import ConfirmationModal from "./ConfirmationModal";
+import Header from "./Header";
 
 const Checklist = () => {
   const [items, setItems] = useState([]); // 項目一覧
@@ -83,6 +85,11 @@ const Checklist = () => {
   // 実施状況をチェック(非同期処理)
   const checkDailyStatus = async (items) => {
     try {
+      if (items.length === 0) {
+        setDailyCheckStatus("本日未実施");
+        return;
+      }
+
       // 今日の日付を取得
       const today = new Date().toLocaleDateString("ja-JP", {
         year: "numeric",
@@ -93,14 +100,16 @@ const Checklist = () => {
       let latestCheckDate = null;
       // unit1の最新の在庫履歴の日付だけを取得
       const { unit1_history } = await fetchStockHistory(items[0].id);
-      const latestUnit1Date = new Date(
-        unit1_history[0].date
-      ).toLocaleDateString("ja-JP", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-      });
-      latestCheckDate = latestUnit1Date;
+      if (unit1_history.length > 0) {
+        const latestUnit1Date = new Date(
+          unit1_history[0].date
+        ).toLocaleDateString("ja-JP", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        });
+        latestCheckDate = latestUnit1Date;
+      }
 
       if (latestCheckDate === today) {
         setDailyCheckStatus("本日実施済み");
@@ -137,7 +146,7 @@ const Checklist = () => {
 
   // キーパッドのボタンを押したときの処理
   const handleKeypadPress = (key) => {
-    const currentStock = // 現在の在庫数を取得
+    const currentStock =
       newStocks[currentItemId] && newStocks[currentItemId][currentUnit]
         ? newStocks[currentItemId][currentUnit]
         : "";
@@ -176,7 +185,7 @@ const Checklist = () => {
     }
   };
 
-  // 新規: モーダルで「いいえ」がクリックされたとき
+  // モーダルで「いいえ」がクリックされたとき
   const handleModalNo = () => {
     setShowModal(false);
   };
@@ -268,100 +277,24 @@ const Checklist = () => {
   };
 
   return (
-    <div className="containe-fluid p-5">
-      <div className="d-flex align-items-center">
-        <h1 className="fw-bold">Daily棚卸</h1>
-        <span className="fw-bold ms-3">{dailyCheckStatus}</span>
-      </div>
+    <div className="container-fluid p-5">
+      <Header dailyCheckStatus={dailyCheckStatus} />
       <AddItem addItem={handleAddItem} />
       <ul className="list-group">
         {items.map((item) => (
-          <li
+          <ChecklistItem
             key={item.id}
-            className={`list-group-item ${
-              // 入力されている場合は背景色を変更
-              isStockComplete(item) ? "bg-info text-white" : ""
-            }`}
-            style={{ width: "70%", margin: "0 auto 0 0" }}
-          >
-            <div className="d-flex justify-content-between align-items-center">
-              <div className="flex-grow-1">{item.item}</div>
-              <div className="d-flex flex-column align-items-center me-3">
-                <input
-                  type="number"
-                  className={`form-control ${
-                    // フォーカスされている場合は枠線の色を強調
-                    currentItemId === item.id && currentUnit === "unit1"
-                      ? "border-primary"
-                      : "border-secondary"
-                  }`}
-                  style={{ width: "100px", textAlign: "center" }}
-                  value={newStocks[item.id]?.unit1 || ""}
-                  onFocus={() => handleFocus(item.id, "unit1")}
-                  readOnly // キーパッドでしか入力できないようにする
-                />
-                <span className="mt-1">{item.unit1}</span>
-              </div>
-              {item.unit2 && (
-                <div className="d-flex flex-column align-items-center me-3">
-                  <input
-                    type="number"
-                    className={`form-control ${
-                      currentItemId === item.id && currentUnit === "unit2"
-                        ? "border-primary"
-                        : "border-secondary"
-                    }`}
-                    style={{ width: "100px", textAlign: "center" }}
-                    value={newStocks[item.id]?.unit2 || ""}
-                    onFocus={() => handleFocus(item.id, "unit2")}
-                    readOnly
-                  />
-                  <span className="mt-1">{item.unit2}</span>
-                </div>
-              )}
-              <button
-                className="btn btn-secondary" // アコーディオンの開閉ボタン
-                onClick={() => toggleAccordion(item.id)}
-              >
-                {accordionState[item.id]
-                  ? "在庫履歴を非表示"
-                  : "在庫履歴を表示"}
-              </button>
-            </div>
-            {accordionState[item.id] &&
-              stockHistory[item.id] && ( // アコーディオンが開いていて，かつ在庫履歴が存在する場合に表示
-                <ul className="list-group mt-2">
-                  <li className="list-group-item">
-                    <div className="d-flex flex-wrap">
-                      {Object.keys(stockHistory[item.id]).map(
-                        (
-                          date,
-                          index // 各日付ごとに在庫数を表示
-                        ) => (
-                          <div key={index} className="me-3">
-                            <span>{date}</span>
-                            <div>
-                              <span style={{ color: "red" }}>
-                                {stockHistory[item.id][date].unit1_history}
-                              </span>
-                              ({item.unit1})
-                            </div>
-                            {item.unit2 !== null && ( // unit2が存在する場合はunit2を表示
-                              <div>
-                                <span style={{ color: "blue" }}>
-                                  {stockHistory[item.id][date].unit2_history}
-                                </span>
-                                ({item.unit2})
-                              </div>
-                            )}
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </li>
-                </ul>
-              )}
-          </li>
+            item={{
+              ...item,
+              currentUnit: currentItemId === item.id ? currentUnit : null,
+            }}
+            newStock={newStocks[item.id] || {}}
+            onFocus={handleFocus}
+            onAccordionToggle={toggleAccordion}
+            isComplete={isStockComplete(item)}
+            isAccordionOpen={accordionState[item.id]}
+            stockHistory={stockHistory[item.id]}
+          />
         ))}
       </ul>
       <div className="d-flex justify-content-end" style={{ width: "70%" }}>
