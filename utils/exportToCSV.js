@@ -1,3 +1,6 @@
+// csv形式で在庫データをエクスポートする
+import { saveAs } from "file-saver";
+
 export const exportToCSV = (stocks, items) => {
   let csvContent = "項目名,在庫数,単位\n";
 
