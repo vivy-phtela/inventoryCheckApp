@@ -27,7 +27,7 @@ const Checklist = () => {
   // ページ読み込み時に1回だけ実行
   useEffect(() => {
     const fetchAndCheckItems = async () => {
-      const fetchedItems = await fetchItems();
+      const fetchedItems = await fetchItems(); // ユーザーごとの項目を取得
       setItems(fetchedItems);
       checkDailyStatus(fetchedItems);
     };
@@ -37,7 +37,7 @@ const Checklist = () => {
   // 在庫履歴をバックエンドから取得してグルーピング(非同期処理)
   const handleFetchStockHistory = async (itemId) => {
     try {
-      const { unit1_history, unit2_history } = await fetchStockHistory(itemId);
+      const { unit1_history, unit2_history } = await fetchStockHistory(itemId); // ユーザーごとの在庫履歴を取得
 
       // 日付ごとにunit1とunit2の在庫数をグルーピング
       const groupedHistory = {};
@@ -124,7 +124,7 @@ const Checklist = () => {
   // 新しい項目をバックエンドに送信(非同期処理)
   const handleAddItem = async (item, unit1, unit2) => {
     try {
-      await addItem(item, unit1, unit2);
+      await addItem(item, unit1, unit2); // ユーザーごとの項目を追加
       const fetchedItems = await fetchItems();
       setItems(fetchedItems); // 最新の項目一覧を取得
     } catch (error) {
@@ -171,7 +171,7 @@ const Checklist = () => {
       // データを送信
       for (const itemId in newStocks) {
         for (const unit in newStocks[itemId]) {
-          await addStock(itemId, newStocks[itemId][unit], unit);
+          await addStock(itemId, newStocks[itemId][unit], unit); // 在庫を追加
         }
       }
       // 在庫数を初期化
@@ -204,7 +204,7 @@ const Checklist = () => {
     });
     // アコーディオンが閉じているとき
     if (!accordionState[itemId]) {
-      handleFetchStockHistory(itemId);
+      handleFetchStockHistory(itemId); // 在庫履歴を取得
     }
   };
 
