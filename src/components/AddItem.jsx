@@ -1,5 +1,5 @@
 // 項目追加コンポーネント
-import React, { useState } from "react";
+import { useState } from "react";
 
 const AddItem = ({ addItem }) => {
   const [newItem, setNewItem] = useState(""); // 新しい項目

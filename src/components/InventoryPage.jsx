@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Keypad from "./Keypad";
 import AddItem from "./AddItem";
 import ConfirmationModal from "./ConfirmationModal";
 import ChecklistItem from "./ChecklistItem";
+import Header from "./Header";
+import LogoutButton from "./LogoutButton";
 import {
   fetchItems,
   addItem,
@@ -10,7 +12,6 @@ import {
   addStock,
 } from "../../utils/supabaseFunctions";
 import { exportToCSV } from "../../utils/exportToCSV";
-import Header from "./Header";
 
 const Checklist = () => {
   const [items, setItems] = useState([]); // 項目一覧
@@ -260,7 +261,10 @@ const Checklist = () => {
 
   return (
     <div className="container-fluid p-5">
-      <Header dailyCheckStatus={dailyCheckStatus} />
+      <div className="d-flex justify-content-between align-items-center">
+        <Header dailyCheckStatus={dailyCheckStatus} />
+        <LogoutButton />
+      </div>
       <AddItem addItem={handleAddItem} />
       <ul className="list-group">
         {items.map((item) => (
