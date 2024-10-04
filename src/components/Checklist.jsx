@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Keypad from "./Keypad";
 import AddItem from "./AddItem";
 import ConfirmationModal from "./ConfirmationModal";
