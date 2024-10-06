@@ -21,16 +21,16 @@ const AddItem = ({ addItem }) => {
   };
 
   return (
-    <div className="mt-3 mb-4">
+    <div className="my-3">
       <button
-        className="btn btn-primary"
+        className="btn btn-danger"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        {isExpanded ? "閉じる" : "新しい項目を追加"}
+        {isExpanded ? "閉じる" : "項目を追加"}
       </button>
 
       {isExpanded && (
-        <div className="card mt-3">
+        <div className=" ms-3 card mt-3" style={{ maxWidth: "600px" }}>
           <div className="card-body">
             <div className="input-group">
               <input
