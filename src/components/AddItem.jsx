@@ -14,7 +14,9 @@ const AddItem = ({ addItem }) => {
       setNewItem("");
       setUnit1("");
       setUnit2("");
-      setIsExpanded(false);
+      setIsExpanded(false); // 項目追加後にフォームを閉じる
+    } else {
+      alert("無効な入力です");
     }
   };
 
