@@ -191,6 +191,8 @@ const Checklist = () => {
       }
       // 在庫数を初期化
       setNewStocks({});
+      // ローカルストレージのデータをリセット
+      localStorage.removeItem("newStocks");
       // CSVを出力
       exportToCSV(newStocks, items);
       setShowModal(false);
