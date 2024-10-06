@@ -24,15 +24,29 @@ const Checklist = () => {
   const [showModal, setShowModal] = useState(false); // モーダルの表示状態
   const [modalMessage, setModalMessage] = useState(""); // モーダルに表示するメッセージ
 
-  // ページ読み込み時に1回だけ実行
+  // データを取得(非同期処理)
   useEffect(() => {
     const fetchAndCheckItems = async () => {
       const fetchedItems = await fetchItems(); // ユーザーごとの項目を取得
       setItems(fetchedItems);
-      checkDailyStatus(fetchedItems);
+      checkDailyStatus(fetchedItems); // 実施状況をチェック
     };
     fetchAndCheckItems();
   }, []);
+
+  // ローカルストレージから入力途中のデータを取得
+  useEffect(() => {
+    const savedStocks = JSON.parse(localStorage.getItem("newStocks")) || {};
+    setNewStocks(savedStocks);
+  }, []);
+
+  // ローカルストレージに入力途中のデータを保存
+  useEffect(() => {
+    // newStocksが空でないときに実行
+    if (Object.keys(newStocks).length > 0) {
+      localStorage.setItem("newStocks", JSON.stringify(newStocks));
+    }
+  }, [newStocks]);
 
   // 在庫履歴をバックエンドから取得してグルーピング(非同期処理)
   const handleFetchStockHistory = async (itemId) => {
@@ -169,6 +183,7 @@ const Checklist = () => {
   const handleModalYes = async () => {
     try {
       // データを送信
+      console.log(newStocks);
       for (const itemId in newStocks) {
         for (const unit in newStocks[itemId]) {
           await addStock(itemId, newStocks[itemId][unit], unit); // 在庫を追加
