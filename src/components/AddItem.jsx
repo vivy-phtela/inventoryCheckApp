@@ -21,7 +21,7 @@ const AddItem = ({ addItem }) => {
   };
 
   return (
-    <div className="my-3">
+    <div className="mt-3 mb-4">
       <button
         className="btn btn-danger"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -30,7 +30,7 @@ const AddItem = ({ addItem }) => {
       </button>
 
       {isExpanded && (
-        <div className=" ms-3 card mt-3" style={{ maxWidth: "600px" }}>
+        <div className="ms-3 card mt-3" style={{ maxWidth: "600px" }}>
           <div className="card-body">
             <div className="input-group">
               <input
