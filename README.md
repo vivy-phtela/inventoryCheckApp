@@ -6,6 +6,13 @@
 
 <br>
 
+## 使用方法
+1. [stock-check-app.vercel.app](https://stock-check-app.vercel.app/)にアクセスする。
+2. テスト用アカウントでログインする。メールアドレスは`test@test.com`、パスワードは`123456`です。
+3. 在庫を入力する。項目の追加もできます。
+
+<br>
+
 ## 使用技術と選定理由
 
 - React(学習の成果を出したかったため。)
