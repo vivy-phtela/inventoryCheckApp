@@ -183,7 +183,7 @@ const Checklist = () => {
   const handleModalYes = async () => {
     try {
       // データを送信
-      console.log(newStocks);
+      // console.log(newStocks);
       for (const itemId in newStocks) {
         for (const unit in newStocks[itemId]) {
           await addStock(itemId, newStocks[itemId][unit], unit); // 在庫を追加
