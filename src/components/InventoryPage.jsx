@@ -234,7 +234,6 @@ const Checklist = () => {
   // ある項目の在庫数が全て正しく入力されているかどうかチェック
   const allStocksEntered = () => {
     // 項目がない場合は確定ボタンを無効にする
-    console.log("length: ", items.length);
     if (items.length === 0) return false;
 
     // everyメソッドは，配列のすべての要素が条件を満たす場合にtrueを返す
