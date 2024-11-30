@@ -70,7 +70,7 @@ ChecklistItem.propTypes = {
     item: PropTypes.string.isRequired,
     unit1: PropTypes.string.isRequired,
     unit2: PropTypes.string,
-    currentUnit: PropTypes.string.isRequired,
+    currentUnit: PropTypes.string,
   }).isRequired,
   newStock: PropTypes.shape({
     unit1: PropTypes.number,
@@ -78,8 +78,8 @@ ChecklistItem.propTypes = {
   }).isRequired,
   onFocus: PropTypes.func.isRequired,
   onAccordionToggle: PropTypes.func.isRequired,
-  isComplete: PropTypes.bool.isRequired,
-  isAccordionOpen: PropTypes.bool.isRequired,
+  isComplete: PropTypes.bool,
+  isAccordionOpen: PropTypes.bool,
   stockHistory: PropTypes.arrayOf(
     PropTypes.shape({
       date: PropTypes.string.isRequired,
