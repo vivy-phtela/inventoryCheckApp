@@ -1,5 +1,6 @@
-// 項目追加コンポーネント
+// 新しい項目を追加するフォームコンポーネント
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const AddItem = ({ addItem }) => {
   const [newItem, setNewItem] = useState(""); // 新しい項目
@@ -63,6 +64,10 @@ const AddItem = ({ addItem }) => {
       )}
     </div>
   );
+};
+
+AddItem.propTypes = {
+  addItem: PropTypes.func.isRequired,
 };
 
 export default AddItem;

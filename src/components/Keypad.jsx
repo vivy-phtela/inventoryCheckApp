@@ -1,4 +1,6 @@
 // キーパッドコンポーネント
+import PropTypes from "prop-types";
+
 const Keypad = ({ handleKeypadPress, handleDelete }) => {
   const keys = [
     [1, 2, 3],
@@ -25,7 +27,6 @@ const Keypad = ({ handleKeypadPress, handleDelete }) => {
               style={{ width: "85px", height: "85px", fontSize: "20px" }}
               onClick={() => {
                 if (key === "Del") handleDelete();
-                else if (key === "Enter") onEnter();
                 else handleKeypadPress(key);
               }}
             >
@@ -36,6 +37,11 @@ const Keypad = ({ handleKeypadPress, handleDelete }) => {
       ))}
     </div>
   );
+};
+
+Keypad.propTypes = {
+  handleKeypadPress: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
 };
 
 export default Keypad;

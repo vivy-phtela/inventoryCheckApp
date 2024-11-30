@@ -1,4 +1,6 @@
 // 在庫履歴を表示するコンポーネント
+import PropTypes from "prop-types";
+
 const StockHistory = ({ item, stockHistory }) => {
   return (
     <ul className="list-group mt-2">
@@ -27,6 +29,19 @@ const StockHistory = ({ item, stockHistory }) => {
       </li>
     </ul>
   );
+};
+
+StockHistory.propTypes = {
+  item: PropTypes.shape({
+    unit1: PropTypes.string.isRequired,
+    unit2: PropTypes.string,
+  }).isRequired,
+  stockHistory: PropTypes.objectOf(
+    PropTypes.shape({
+      unit1_history: PropTypes.number.isRequired,
+      unit2_history: PropTypes.number,
+    })
+  ).isRequired,
 };
 
 export default StockHistory;
