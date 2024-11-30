@@ -1,6 +1,19 @@
-// 確認モーダルコンポーネント
+// 確認用のモーダルコンポーネント
+import { useState } from "react";
+import PropTypes from "prop-types";
+
 const ConfirmationModal = ({ show, message, onConfirm, onCancel }) => {
-  if (!show) return null; // モーダルが表示されていない場合は何もレンダリングしない
+  const [isLoading, setIsLoading] = useState(false); // ローディング状態
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    try {
+      await onConfirm();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!show) return null; // モーダルが表示されない場合は何も表示しない
 
   return (
     <div
@@ -20,21 +33,36 @@ const ConfirmationModal = ({ show, message, onConfirm, onCancel }) => {
               type="button"
               className="btn btn-secondary"
               onClick={onCancel}
+              disabled={isLoading} // ローディング中は無効化
             >
               いいえ
             </button>
             <button
               type="button"
               className="btn btn-primary"
-              onClick={onConfirm}
+              onClick={handleConfirm}
+              disabled={isLoading} // ローディング中は無効化
             >
-              はい
+              {isLoading ? (
+                <div className="spinner-border spinner-border-sm" role="status">
+                  <span className="visually-hidden"></span>
+                </div>
+              ) : (
+                "はい"
+              )}
             </button>
           </div>
         </div>
       </div>
     </div>
   );
+};
+
+ConfirmationModal.propTypes = {
+  show: PropTypes.bool.isRequired,
+  message: PropTypes.string.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default ConfirmationModal;
