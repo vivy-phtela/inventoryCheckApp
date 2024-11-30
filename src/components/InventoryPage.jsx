@@ -182,8 +182,33 @@ const Checklist = () => {
   // モーダルで「はい」がクリックされたとき
   const handleModalYes = async () => {
     try {
-      // データを送信
-      // console.log(newStocks);
+      // スプレッドシートにデータを送信
+      const GAS_ENDPOINT = import.meta.env.VITE_GAS_ENDPOINT;
+
+      const dataToSend = {
+        items: Object.keys(newStocks).map((itemId) => ({
+          itemId,
+          unit1Stock: newStocks[itemId]?.unit1 || "",
+          unit2Stock: newStocks[itemId]?.unit2 || "",
+        })),
+      };
+
+      const response = await fetch(GAS_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        console.log("Data successfully sent to Google Sheets");
+      } else {
+        console.error("Failed to send data:", result.error);
+      }
+
+      // Supabaseにデータを送信
       for (const itemId in newStocks) {
         for (const unit in newStocks[itemId]) {
           await addStock(itemId, newStocks[itemId][unit], unit); // 在庫を追加
@@ -193,8 +218,7 @@ const Checklist = () => {
       setNewStocks({});
       // ローカルストレージのデータをリセット
       localStorage.removeItem("newStocks");
-      // CSVを出力
-      exportToCSV(newStocks, items);
+      // exportToCSV(newStocks, items);
       setShowModal(false);
       window.location.reload();
     } catch (error) {
