@@ -44,8 +44,14 @@ const ConfirmationModal = ({ show, message, onConfirm, onCancel }) => {
               disabled={isLoading} // ローディング中は無効化
             >
               {isLoading ? (
-                <div className="spinner-border spinner-border-sm" role="status">
-                  <span className="visually-hidden"></span>
+                <div className="d-flex align-items-center">
+                  <div
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  >
+                    <span className="visually-hidden"></span>
+                  </div>
+                  Loading...
                 </div>
               ) : (
                 "はい"
