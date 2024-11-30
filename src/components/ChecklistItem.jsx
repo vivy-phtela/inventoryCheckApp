@@ -1,4 +1,7 @@
 // 項目ごとの在庫を入力するコンポーネント
+import PropTypes from "prop-types";
+import StockHistory from "./Stockhistory";
+
 const ChecklistItem = ({
   item,
   newStock,
@@ -61,6 +64,28 @@ const ChecklistItem = ({
   );
 };
 
-import StockHistory from "./Stockhistory";
+ChecklistItem.propTypes = {
+  item: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    item: PropTypes.string.isRequired,
+    unit1: PropTypes.string.isRequired,
+    unit2: PropTypes.string,
+    currentUnit: PropTypes.string.isRequired,
+  }).isRequired,
+  newStock: PropTypes.shape({
+    unit1: PropTypes.number,
+    unit2: PropTypes.number,
+  }).isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onAccordionToggle: PropTypes.func.isRequired,
+  isComplete: PropTypes.bool.isRequired,
+  isAccordionOpen: PropTypes.bool.isRequired,
+  stockHistory: PropTypes.arrayOf(
+    PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      stock: PropTypes.number.isRequired,
+    })
+  ),
+};
 
 export default ChecklistItem;
