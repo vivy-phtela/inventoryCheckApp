@@ -1,7 +1,6 @@
-// ログアウトボタンを表示するコンポーネント
-import { supabase } from "../../utils/supabase";
+import { supabase } from "../../../../../../../utils/supabase";
 
-const LogoutButton = () => {
+export const LogoutButton = () => {
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
 
@@ -20,5 +19,3 @@ const LogoutButton = () => {
     </div>
   );
 };
-
-export default LogoutButton;

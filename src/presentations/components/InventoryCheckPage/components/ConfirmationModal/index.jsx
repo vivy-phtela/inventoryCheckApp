@@ -1,8 +1,7 @@
-// 確認用のモーダルコンポーネント
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const ConfirmationModal = ({ show, message, onConfirm, onCancel }) => {
+export const ConfirmationModal = ({ show, message, onConfirm, onCancel }) => {
   const [isLoading, setIsLoading] = useState(false); // ローディング状態
   const handleConfirm = async () => {
     setIsLoading(true);
@@ -70,5 +69,3 @@ ConfirmationModal.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };
-
-export default ConfirmationModal;

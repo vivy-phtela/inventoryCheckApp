@@ -1,15 +1,14 @@
-// 項目ごとの在庫を入力するコンポーネント
 import PropTypes from "prop-types";
-import StockHistory from "./Stockhistory";
+import { InventoryHistory } from "./components";
 
-const ChecklistItem = ({
+export const ChecklistItem = ({
   item,
-  newStock,
+  newInventory,
   onFocus,
   onAccordionToggle,
   isComplete,
   isAccordionOpen,
-  stockHistory,
+  inventoryHistory,
 }) => {
   return (
     <li
@@ -27,7 +26,7 @@ const ChecklistItem = ({
                 : "border-secondary"
             }`}
             style={{ width: "100px", textAlign: "center" }}
-            value={newStock.unit1 || ""}
+            value={newInventory.unit1 || ""}
             onFocus={() => onFocus(item.id, "unit1")}
             readOnly
           />
@@ -43,7 +42,7 @@ const ChecklistItem = ({
                   : "border-secondary"
               }`}
               style={{ width: "100px", textAlign: "center" }}
-              value={newStock.unit2 || ""}
+              value={newInventory.unit2 || ""}
               onFocus={() => onFocus(item.id, "unit2")}
               readOnly
             />
@@ -57,8 +56,8 @@ const ChecklistItem = ({
           {isAccordionOpen ? "在庫履歴を非表示" : "在庫履歴を表示"}
         </button>
       </div>
-      {isAccordionOpen && stockHistory && (
-        <StockHistory item={item} stockHistory={stockHistory} />
+      {isAccordionOpen && inventoryHistory && (
+        <InventoryHistory item={item} inventoryHistory={inventoryHistory} />
       )}
     </li>
   );
@@ -72,20 +71,16 @@ ChecklistItem.propTypes = {
     unit2: PropTypes.string,
     currentUnit: PropTypes.string,
   }).isRequired,
-  newStock: PropTypes.shape({
-    unit1: PropTypes.number,
-    unit2: PropTypes.number,
+  newInventory: PropTypes.shape({
+    unit1: PropTypes.string,
+    unit2: PropTypes.string,
   }).isRequired,
-  onFocus: PropTypes.func.isRequired,
-  onAccordionToggle: PropTypes.func.isRequired,
+  onFocus: PropTypes.func,
+  onAccordionToggle: PropTypes.func,
   isComplete: PropTypes.bool,
   isAccordionOpen: PropTypes.bool,
-  stockHistory: PropTypes.arrayOf(
-    PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      stock: PropTypes.number.isRequired,
-    })
-  ),
+  inventoryHistory: PropTypes.shape({
+    date: PropTypes.string,
+    inventory: PropTypes.number,
+  }),
 };
-
-export default ChecklistItem;
