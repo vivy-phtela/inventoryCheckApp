@@ -1,7 +1,7 @@
 // キーパッドコンポーネント
 import PropTypes from "prop-types";
 
-const Keypad = ({ handleKeypadPress, handleDelete }) => {
+export const Keypad = ({ handleKeypadPress, handleDelete }) => {
   const keys = [
     [1, 2, 3],
     [4, 5, 6],
@@ -43,5 +43,3 @@ Keypad.propTypes = {
   handleKeypadPress: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
 };
-
-export default Keypad;

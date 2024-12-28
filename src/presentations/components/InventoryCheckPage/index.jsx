@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
-import Keypad from "./Keypad";
-import AddItem from "./AddItem";
-import ConfirmationModal from "./ConfirmationModal";
-import ChecklistItem from "./ChecklistItem";
-import Header from "./Header";
-import LogoutButton from "./LogoutButton";
+import {
+  Keypad,
+  AddItem,
+  ConfirmationModal,
+  ChecklistItem,
+  Header,
+} from "./components";
 import {
   fetchItems,
   addItem,
   fetchStockHistory,
   addStock,
-} from "../../utils/supabaseFunctions";
-import { exportToCSV } from "../../utils/exportToCSV";
+} from "../../../../utils/supabaseFunctions";
 
-const Checklist = () => {
+export const InventoryCheckPage = () => {
   const [items, setItems] = useState([]); // 項目一覧
   const [newStocks, setNewStocks] = useState({}); // 入力した在庫数を保持
   const [stockHistory, setStockHistory] = useState({}); // 在庫履歴
@@ -307,7 +307,6 @@ const Checklist = () => {
     <div className="container-fluid p-5">
       <div className="d-flex justify-content-between align-items-center">
         <Header dailyCheckStatus={dailyCheckStatus} />
-        <LogoutButton />
       </div>
       <AddItem addItem={handleAddItem} />
       <ul className="list-group">
@@ -350,5 +349,3 @@ const Checklist = () => {
     </div>
   );
 };
-
-export default Checklist;

@@ -1,7 +1,7 @@
 // 在庫履歴を表示するコンポーネント
 import PropTypes from "prop-types";
 
-const StockHistory = ({ item, stockHistory }) => {
+export const StockHistory = ({ item, stockHistory }) => {
   return (
     <ul className="list-group mt-2">
       <li className="list-group-item">
@@ -43,5 +43,3 @@ StockHistory.propTypes = {
     })
   ).isRequired,
 };
-
-export default StockHistory;

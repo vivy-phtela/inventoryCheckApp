@@ -1,8 +1,8 @@
 // 項目ごとの在庫を入力するコンポーネント
 import PropTypes from "prop-types";
-import StockHistory from "./Stockhistory";
+import { StockHistory } from "./components";
 
-const ChecklistItem = ({
+export const ChecklistItem = ({
   item,
   newStock,
   onFocus,
@@ -87,5 +87,3 @@ ChecklistItem.propTypes = {
     })
   ),
 };
-
-export default ChecklistItem;

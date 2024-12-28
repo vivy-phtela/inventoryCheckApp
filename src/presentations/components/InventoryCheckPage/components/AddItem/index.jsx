@@ -2,7 +2,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const AddItem = ({ addItem }) => {
+export const AddItem = ({ addItem }) => {
   const [newItem, setNewItem] = useState(""); // 新しい項目
   const [unit1, setUnit1] = useState(""); // メイン単位
   const [unit2, setUnit2] = useState(""); // サブ単位
@@ -69,5 +69,3 @@ const AddItem = ({ addItem }) => {
 AddItem.propTypes = {
   addItem: PropTypes.func.isRequired,
 };
-
-export default AddItem;

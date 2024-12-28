@@ -1,8 +1,8 @@
 // ログインページのコンポーネント
 import { useState } from "react";
-import { supabase } from "../../utils/supabase";
+import { supabase } from "../../../../utils/supabase";
 
-const LoginPage = () => {
+export const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -63,5 +63,3 @@ const LoginPage = () => {
     </div>
   );
 };
-
-export default LoginPage;
