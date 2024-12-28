@@ -1,6 +1,6 @@
 // ログインページのコンポーネント
 import { useState } from "react";
-import { supabase } from "../../../../utils/supabase";
+import { supabase } from "../../../utils/supabase";
 
 export const LoginPage = () => {
   const [email, setEmail] = useState("");

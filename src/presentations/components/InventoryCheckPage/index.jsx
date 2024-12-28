@@ -11,7 +11,7 @@ import {
   addItem,
   fetchStockHistory,
   addStock,
-} from "../../../../utils/supabaseFunctions";
+} from "../../../utils/supabaseFunctions";
 
 export const InventoryCheckPage = () => {
   const [items, setItems] = useState([]); // 項目一覧
