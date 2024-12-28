@@ -32,9 +32,7 @@ export const InventoryCheckPage = () => {
 
   return (
     <div className="container-fluid p-5">
-      <div className="d-flex justify-content-between align-items-center">
-        <Header dailyCheckStatus={dailyCheckStatus} />
-      </div>
+      <Header dailyCheckStatus={dailyCheckStatus} />
       <AddItem addItem={handleAddItem} />
       <ul className="list-group">
         {items.map((item) => (
