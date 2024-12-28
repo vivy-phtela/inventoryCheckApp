@@ -72,11 +72,11 @@ ChecklistItem.propTypes = {
     currentUnit: PropTypes.string,
   }).isRequired,
   newInventory: PropTypes.shape({
-    unit1: PropTypes.string.isRequired,
+    unit1: PropTypes.string,
     unit2: PropTypes.string,
   }).isRequired,
-  onFocus: PropTypes.func.isRequired,
-  onAccordionToggle: PropTypes.func.isRequired,
+  onFocus: PropTypes.func,
+  onAccordionToggle: PropTypes.func,
   isComplete: PropTypes.bool,
   isAccordionOpen: PropTypes.bool,
   inventoryHistory: PropTypes.shape({
