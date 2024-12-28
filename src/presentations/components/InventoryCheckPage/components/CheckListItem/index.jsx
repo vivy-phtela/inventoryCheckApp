@@ -80,10 +80,8 @@ ChecklistItem.propTypes = {
   onAccordionToggle: PropTypes.func.isRequired,
   isComplete: PropTypes.bool,
   isAccordionOpen: PropTypes.bool,
-  inventoryHistory: PropTypes.arrayOf(
-    PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      inventory: PropTypes.number.isRequired,
-    })
-  ),
+  inventoryHistory: PropTypes.shape({
+    date: PropTypes.string,
+    inventory: PropTypes.number,
+  }),
 };
