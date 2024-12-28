@@ -1,4 +1,3 @@
-// ログアウトボタンを表示するコンポーネント
 import { supabase } from "../../../../../../../utils/supabase";
 
 export const LogoutButton = () => {

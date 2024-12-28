@@ -1,4 +1,3 @@
-// 在庫履歴を表示するコンポーネント
 import PropTypes from "prop-types";
 
 export const InventoryHistory = ({ item, inventoryHistory }) => {

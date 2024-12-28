@@ -1,4 +1,3 @@
-// 項目ごとの在庫を入力するコンポーネント
 import PropTypes from "prop-types";
 import { InventoryHistory } from "./components";
 

@@ -1,4 +1,3 @@
-// キーパッドコンポーネント
 import PropTypes from "prop-types";
 
 export const Keypad = ({ handleKeypadPress, handleDelete }) => {
