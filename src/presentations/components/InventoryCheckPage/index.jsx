@@ -10,8 +10,8 @@ import { useInventoryCheck } from "./hooks";
 export const InventoryCheckPage = () => {
   const {
     items,
-    newStocks,
-    stockHistory,
+    newInventorys,
+    inventoryHistory,
     accordionState,
     currentItemId,
     currentUnit,
@@ -26,8 +26,8 @@ export const InventoryCheckPage = () => {
     handleModalNo,
     toggleAccordion,
     handleFocus,
-    allStocksEntered,
-    isStockComplete,
+    allInventorysEntered,
+    isInventoryComplete,
   } = useInventoryCheck();
 
   return (
@@ -44,12 +44,12 @@ export const InventoryCheckPage = () => {
               ...item,
               currentUnit: currentItemId === item.id ? currentUnit : null,
             }}
-            newStock={newStocks[item.id] || {}}
+            newInventory={newInventorys[item.id] || {}}
             onFocus={handleFocus}
             onAccordionToggle={toggleAccordion}
-            isComplete={isStockComplete(item)}
+            isComplete={isInventoryComplete(item)}
             isAccordionOpen={accordionState[item.id]}
-            stockHistory={stockHistory[item.id]}
+            inventoryHistory={inventoryHistory[item.id]}
           />
         ))}
       </ul>
@@ -57,7 +57,7 @@ export const InventoryCheckPage = () => {
         <button
           className="btn btn-success mt-3 btn-lg"
           onClick={handleConfirmClick}
-          disabled={!allStocksEntered()} // すべての欄が入力されている場合のみ有効に
+          disabled={!allInventorysEntered()} // すべての欄が入力されている場合のみ有効に
         >
           確定
         </button>

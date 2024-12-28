@@ -30,12 +30,12 @@ export const addItem = async (item, unit1, unit2) => {
 };
 
 // 在庫履歴を取得
-export const fetchStockHistory = async (itemId) => {
+export const fetchInventoryHistory = async (itemId) => {
   const userId = await getUserId();
 
   // unit1の在庫履歴を取得
   const { data: unit1Data, error: unit1Error } = await supabase
-    .from("stock_history")
+    .from("inventory_history")
     .select("*")
     .eq("item_id", itemId)
     .eq("unit", "unit1")
@@ -47,7 +47,7 @@ export const fetchStockHistory = async (itemId) => {
 
   // unit2の在庫履歴を取得
   const { data: unit2Data, error: unit2Error } = await supabase
-    .from("stock_history")
+    .from("inventory_history")
     .select("*")
     .eq("item_id", itemId)
     .eq("unit", "unit2")
@@ -58,17 +58,23 @@ export const fetchStockHistory = async (itemId) => {
   if (unit2Error) throw unit2Error;
 
   return {
-    unit1_history: unit1Data.map((sh) => ({ stock: sh.stock, date: sh.date })),
-    unit2_history: unit2Data.map((sh) => ({ stock: sh.stock, date: sh.date })),
+    unit1_history: unit1Data.map((sh) => ({
+      inventory: sh.inventory,
+      date: sh.date,
+    })),
+    unit2_history: unit2Data.map((sh) => ({
+      inventory: sh.inventory,
+      date: sh.date,
+    })),
   };
 };
 
 // 在庫数を追加
-export const addStock = async (itemId, stock, unit) => {
+export const addInventory = async (itemId, inventory, unit) => {
   const userId = await getUserId();
   const { data, error } = await supabase
-    .from("stock_history")
-    .insert([{ item_id: itemId, stock, unit, user_id: userId }]);
+    .from("inventory_history")
+    .insert([{ item_id: itemId, inventory, unit, user_id: userId }]);
   if (error) throw error;
   return data;
 };

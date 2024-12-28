@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import {
   fetchItems,
   addItem,
-  fetchStockHistory,
-  addStock,
+  fetchInventoryHistory,
+  addInventory,
 } from "../../../../utils/supabaseFunctions";
 
 export const useInventoryCheck = () => {
   const [items, setItems] = useState([]); // 項目一覧
-  const [newStocks, setNewStocks] = useState({}); // 入力した在庫数を保持
-  const [stockHistory, setStockHistory] = useState({}); // 在庫履歴
+  const [newInventorys, setNewInventorys] = useState({}); // 入力した在庫数を保持
+  const [inventoryHistory, setInventoryHistory] = useState({}); // 在庫履歴
   const [accordionState, setAccordionState] = useState({}); // 履歴表示アコーディオンの開閉状態
   const [currentItemId, setCurrentItemId] = useState(null); // フォーカスされてる項目のID
   const [currentUnit, setCurrentUnit] = useState(null); // フォーカスされてる単位(unit1かunit2)
@@ -29,22 +29,25 @@ export const useInventoryCheck = () => {
 
   // ローカルストレージから入力途中のデータを取得
   useEffect(() => {
-    const savedStocks = JSON.parse(localStorage.getItem("newStocks")) || {};
-    setNewStocks(savedStocks);
+    const savedInventorys =
+      JSON.parse(localStorage.getItem("newInventorys")) || {};
+    setNewInventorys(savedInventorys);
   }, []);
 
   // ローカルストレージに入力途中のデータを保存
   useEffect(() => {
-    // newStocksが空でないときに実行
-    if (Object.keys(newStocks).length > 0) {
-      localStorage.setItem("newStocks", JSON.stringify(newStocks));
+    // newInventorysが空でないときに実行
+    if (Object.keys(newInventorys).length > 0) {
+      localStorage.setItem("newInventorys", JSON.stringify(newInventorys));
     }
-  }, [newStocks]);
+  }, [newInventorys]);
 
   // 在庫履歴をバックエンドから取得してグルーピング(非同期処理)
-  const handleFetchStockHistory = async (itemId) => {
+  const handleFetchInventoryHistory = async (itemId) => {
     try {
-      const { unit1_history, unit2_history } = await fetchStockHistory(itemId); // ユーザーごとの在庫履歴を取得
+      const { unit1_history, unit2_history } = await fetchInventoryHistory(
+        itemId
+      ); // ユーザーごとの在庫履歴を取得
 
       // 日付ごとにunit1とunit2の在庫数をグルーピング
       const groupedHistory = {};
@@ -60,7 +63,7 @@ export const useInventoryCheck = () => {
         if (!groupedHistory[date]) {
           groupedHistory[date] = {};
         }
-        groupedHistory[date].unit1_history = entry.stock;
+        groupedHistory[date].unit1_history = entry.inventory;
       });
 
       unit2_history.forEach((entry) => {
@@ -75,17 +78,17 @@ export const useInventoryCheck = () => {
         if (!groupedHistory[date]) {
           groupedHistory[date] = {};
         }
-        groupedHistory[date].unit2_history = entry.stock;
+        groupedHistory[date].unit2_history = entry.inventory;
       });
 
       // 在庫履歴を更新
-      setStockHistory((prevHistory) => {
+      setInventoryHistory((prevHistory) => {
         const newHistory = { ...prevHistory };
         newHistory[itemId] = groupedHistory;
         return newHistory;
       });
     } catch (error) {
-      console.error("Failed to fetch stock history:", error);
+      console.error("Failed to fetch inventory history:", error);
     }
   };
 
@@ -106,7 +109,7 @@ export const useInventoryCheck = () => {
 
       let latestCheckDate = null;
       // unit1の最新の在庫履歴の日付だけを取得
-      const { unit1_history } = await fetchStockHistory(items[0].id);
+      const { unit1_history } = await fetchInventoryHistory(items[0].id);
       if (unit1_history.length > 0) {
         const latestUnit1Date = new Date(
           unit1_history[0].date
@@ -139,31 +142,31 @@ export const useInventoryCheck = () => {
     }
   };
 
-  // setNewStocksの更新
-  const handleStockChange = (itemId, unit, stock) => {
-    setNewStocks((prevStocks) => {
-      const updatedStocks = { ...prevStocks };
-      if (!updatedStocks[itemId]) {
-        updatedStocks[itemId] = {}; // 新規項目の場合は初期化
+  // setNewInventorysの更新
+  const handleInventoryChange = (itemId, unit, inventory) => {
+    setNewInventorys((prevInventorys) => {
+      const updatedInventorys = { ...prevInventorys };
+      if (!updatedInventorys[itemId]) {
+        updatedInventorys[itemId] = {}; // 新規項目の場合は初期化
       }
-      updatedStocks[itemId][unit] = stock; // 在庫数を更新
-      return updatedStocks;
+      updatedInventorys[itemId][unit] = inventory; // 在庫数を更新
+      return updatedInventorys;
     });
   };
 
   // キーパッドのボタンを押したときの処理
   const handleKeypadPress = (key) => {
-    const currentStock =
-      newStocks[currentItemId] && newStocks[currentItemId][currentUnit]
-        ? newStocks[currentItemId][currentUnit]
+    const currentInventory =
+      newInventorys[currentItemId] && newInventorys[currentItemId][currentUnit]
+        ? newInventorys[currentItemId][currentUnit]
         : "";
-    const newStock = currentStock + key.toString();
-    handleStockChange(currentItemId, currentUnit, newStock); // 入力した在庫数を更新
+    const newInventory = currentInventory + key.toString();
+    handleInventoryChange(currentItemId, currentUnit, newInventory); // 入力した在庫数を更新
   };
 
   // 入力した在庫数を削除
   const handleDelete = () => {
-    handleStockChange(currentItemId, currentUnit, "");
+    handleInventoryChange(currentItemId, currentUnit, "");
   };
 
   // モーダルを表示
@@ -179,10 +182,10 @@ export const useInventoryCheck = () => {
       const GAS_ENDPOINT = import.meta.env.VITE_GAS_ENDPOINT;
 
       const dataToSend = {
-        items: Object.keys(newStocks).map((itemId) => ({
+        items: Object.keys(newInventorys).map((itemId) => ({
           itemId,
-          unit1Stock: newStocks[itemId]?.unit1 || "",
-          unit2Stock: newStocks[itemId]?.unit2 || "",
+          unit1Inventory: newInventorys[itemId]?.unit1 || "",
+          unit2Inventory: newInventorys[itemId]?.unit2 || "",
         })),
       };
 
@@ -202,20 +205,20 @@ export const useInventoryCheck = () => {
       }
 
       // Supabaseにデータを送信
-      for (const itemId in newStocks) {
-        for (const unit in newStocks[itemId]) {
-          await addStock(itemId, newStocks[itemId][unit], unit); // 在庫を追加
+      for (const itemId in newInventorys) {
+        for (const unit in newInventorys[itemId]) {
+          await addInventory(itemId, newInventorys[itemId][unit], unit); // 在庫を追加
         }
       }
       // 在庫数を初期化
-      setNewStocks({});
+      setNewInventorys({});
       // ローカルストレージのデータをリセット
-      localStorage.removeItem("newStocks");
-      // exportToCSV(newStocks, items);
+      localStorage.removeItem("newInventorys");
+      // exportToCSV(newInventorys, items);
       setShowModal(false);
       window.location.reload();
     } catch (error) {
-      console.error("Failed to add stocks:", error);
+      console.error("Failed to add inventorys:", error);
     }
   };
 
@@ -238,7 +241,7 @@ export const useInventoryCheck = () => {
     });
     // アコーディオンが閉じているとき
     if (!accordionState[itemId]) {
-      handleFetchStockHistory(itemId); // 在庫履歴を取得
+      handleFetchInventoryHistory(itemId); // 在庫履歴を取得
     }
   };
 
@@ -249,7 +252,7 @@ export const useInventoryCheck = () => {
   };
 
   // ある項目の在庫数が全て正しく入力されているかどうかチェック
-  const allStocksEntered = () => {
+  const allInventorysEntered = () => {
     // 項目がない場合は確定ボタンを無効にする
     if (items.length === 0) return false;
 
@@ -258,48 +261,48 @@ export const useInventoryCheck = () => {
       // unit2が存在する場合はunit1とunit2の両方が入力されているかどうかチェック
       if (item.unit2) {
         return (
-          newStocks[item.id] &&
-          newStocks[item.id].unit1 !== undefined &&
-          newStocks[item.id].unit1 !== "" &&
-          newStocks[item.id].unit2 !== undefined &&
-          newStocks[item.id].unit2 !== ""
+          newInventorys[item.id] &&
+          newInventorys[item.id].unit1 !== undefined &&
+          newInventorys[item.id].unit1 !== "" &&
+          newInventorys[item.id].unit2 !== undefined &&
+          newInventorys[item.id].unit2 !== ""
         );
       }
       // unit1のみチェック
       else {
         return (
-          newStocks[item.id] &&
-          newStocks[item.id].unit1 !== undefined &&
-          newStocks[item.id].unit1 !== ""
+          newInventorys[item.id] &&
+          newInventorys[item.id].unit1 !== undefined &&
+          newInventorys[item.id].unit1 !== ""
         );
       }
     });
   };
 
   // 全ての項目の在庫数が全て正しく入力されているかどうかチェック
-  const isStockComplete = (item) => {
+  const isInventoryComplete = (item) => {
     // unit2が存在する場合はunit1とunit2の両方が入力されているかどうかチェック
     if (item.unit2) {
       return (
-        newStocks[item.id] &&
-        newStocks[item.id].unit1 !== undefined &&
-        newStocks[item.id].unit1 !== "" &&
-        newStocks[item.id].unit2 !== undefined &&
-        newStocks[item.id].unit2 !== ""
+        newInventorys[item.id] &&
+        newInventorys[item.id].unit1 !== undefined &&
+        newInventorys[item.id].unit1 !== "" &&
+        newInventorys[item.id].unit2 !== undefined &&
+        newInventorys[item.id].unit2 !== ""
       );
     }
     // unit1のみチェック
     return (
-      newStocks[item.id] &&
-      newStocks[item.id].unit1 !== undefined &&
-      newStocks[item.id].unit1 !== ""
+      newInventorys[item.id] &&
+      newInventorys[item.id].unit1 !== undefined &&
+      newInventorys[item.id].unit1 !== ""
     );
   };
 
   return {
     items,
-    newStocks,
-    stockHistory,
+    newInventorys,
+    inventoryHistory,
     accordionState,
     currentItemId,
     currentUnit,
@@ -314,7 +317,7 @@ export const useInventoryCheck = () => {
     handleModalNo,
     toggleAccordion,
     handleFocus,
-    allStocksEntered,
-    isStockComplete,
+    allInventorysEntered,
+    isInventoryComplete,
   };
 };
