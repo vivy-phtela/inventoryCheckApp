@@ -50,37 +50,34 @@ export const useInventoryCheck = () => {
         itemId
       ); // ユーザーごとの在庫履歴を取得
 
-      // 日付ごとにunit1とunit2の在庫数をグルーピング
-      const groupedHistory = {};
-      unit1_history.forEach((entry) => {
-        const date = new Date(entry.date).toLocaleString("ja-JP", {
+      // 日付を「分」単位で丸める
+      const roundToMinute = (dateString) => {
+        const date = new Date(dateString);
+        date.setSeconds(0, 0); // 秒以降を切り捨て
+        return date.toLocaleString("ja-JP", {
           year: "numeric",
           month: "numeric",
           day: "numeric",
           hour: "numeric",
           minute: "numeric",
-          second: "numeric",
         });
-        if (!groupedHistory[date]) {
-          groupedHistory[date] = {};
-        }
-        groupedHistory[date].unit1_history = entry.inventory;
-      });
+      };
 
-      unit2_history.forEach((entry) => {
-        const date = new Date(entry.date).toLocaleString("ja-JP", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
+      // unit1とunit2のデータをグルーピング
+      const groupByDate = (history, key) => {
+        history.forEach((entry) => {
+          const roundedDate = roundToMinute(entry.date);
+          if (!groupedHistory[roundedDate]) {
+            groupedHistory[roundedDate] = {};
+          }
+          groupedHistory[roundedDate][key] = entry.inventory;
         });
-        if (!groupedHistory[date]) {
-          groupedHistory[date] = {};
-        }
-        groupedHistory[date].unit2_history = entry.inventory;
-      });
+      };
+
+      const groupedHistory = {};
+
+      groupByDate(unit1_history, "unit1_history");
+      groupByDate(unit2_history, "unit2_history");
 
       // 在庫履歴を更新
       setInventoryHistory((prevHistory) => {
