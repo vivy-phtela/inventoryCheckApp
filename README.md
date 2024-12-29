@@ -7,10 +7,11 @@
 <br>
 
 ## 使用方法
-1. [stock-check-app.vercel.app](https://stock-check-app.vercel.app/)にアクセスする。
+1. [inventory-check-app.vercel.app](https://inventory-check-app.vercel.app/)にアクセスする。
 2. テスト用アカウントでログインする。メールアドレスは`test@test.com`、パスワードは`123456`です。
 3. 在庫を入力する。(iPadで使ってもらうため、在庫の入力は画面右下のキーパッドからしか行えません)
-4. 項目の追加も可能です。
+4. 全ての項目を入力したら確定ボタンを押して終了。(入力内容はスプレッドシートに自動で保存される(スプレッドシートは権限関係でこちらに共有していません))
+5. 項目の追加も可能です。
 
 <br>
 
