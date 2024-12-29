@@ -43,6 +43,9 @@ export const fetchInventoryHistory = async (itemId) => {
     .order("date", { ascending: false })
     .limit(3); // 最新の3件のみ取得
 
+  // 取得後に昇順に並び替え
+  unit1Data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
   if (unit1Error) throw unit1Error;
 
   // unit2の在庫履歴を取得
@@ -54,6 +57,9 @@ export const fetchInventoryHistory = async (itemId) => {
     .eq("user_id", userId)
     .order("date", { ascending: false })
     .limit(3); // 最新の3件のみ取得
+
+  // 取得後に昇順に並び替え
+  unit2Data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   if (unit2Error) throw unit2Error;
 
