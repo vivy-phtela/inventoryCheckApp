@@ -78,3 +78,21 @@ export const addInventory = async (itemId, inventory, unit) => {
   if (error) throw error;
   return data;
 };
+
+// IDに対応している商品名、単位を取得
+export const fetchSupportedItems = async () => {
+  const userId = await getUserId();
+  const { data, error } = await supabase
+    .from("items")
+    .select("id, item, unit1, unit2")
+    .eq("user_id", userId);
+
+  if (error) throw error;
+
+  return data.map((item) => ({
+    id: item.id,
+    name: item.item,
+    unit1: item.unit1,
+    unit2: item.unit2,
+  }));
+};
