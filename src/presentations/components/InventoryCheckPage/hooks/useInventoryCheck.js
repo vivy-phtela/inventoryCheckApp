@@ -108,9 +108,10 @@ export const useInventoryCheck = () => {
       let latestCheckDate = null;
       // unit1の最新の在庫履歴の日付だけを取得
       const { unit1_history } = await fetchInventoryHistory(items[0].id);
+      console.log("unit1_history:", unit1_history);
       if (unit1_history.length > 0) {
         const latestUnit1Date = new Date(
-          unit1_history[0].date
+          unit1_history[unit1_history.length - 1].date
         ).toLocaleDateString("ja-JP", {
           year: "numeric",
           month: "numeric",
@@ -118,6 +119,7 @@ export const useInventoryCheck = () => {
         });
         latestCheckDate = latestUnit1Date;
       }
+      console.log("latestCheckDate:", latestCheckDate);
 
       if (latestCheckDate === today) {
         setDailyCheckStatus("本日実施済み");
